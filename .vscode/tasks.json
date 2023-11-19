@@ -1,0 +1,47 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "cargo build debug",
+            "type": "shell",
+            "command": "cargo",
+            "args": [
+                "build",
+                "--bin",
+                "${fileBasenameNoExtension}"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "cargo build release",
+            "type": "shell",
+            "command": "cargo",
+            "args": [
+                "build",
+                "--release",
+                "--bin",
+                "${fileBasenameNoExtension}"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "OpenOcd Flash Release",
+            "type": "shell",
+            "command": "C:/Users/Administrator/.eide/tools/openocd_7a1adfbec_mingw32/bin/openocd",
+            "args": [
+                "-f",
+                "interface/cmsis-dap.cfg",
+                "-f",
+                "target/stm32f1x.cfg",
+                "-c",
+                "adapter speed 20000",
+                "-c",
+                "program ./target/thumbv7m-none-eabi/release/${fileBasenameNoExtension} verify reset exit",
+            ],
+            "group": "build",
+            "dependsOn": [
+                "cargo build release"
+            ],
+        },
+    ]
+}
