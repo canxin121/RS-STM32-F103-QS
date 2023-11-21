@@ -2,6 +2,79 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "OpenOcd Flash Release",
+            "type": "shell",
+            "command": "openocd",
+            "args": [
+                "-f",
+                "./cmsis-dap.cfg",
+                "-f",
+                "./stm32f1x.cfg",
+                "-c",
+                "program ./target/thumbv7m-none-eabi/release/${fileBasenameNoExtension} verify reset exit",
+            ],
+            "group": "build",
+            "dependsOn": [
+                "cargo build release"
+            ],
+        },
+        {
+            "label": "OpenOcd Flash Debug",
+            "type": "shell",
+            "command": "openocd",
+            "args": [
+                "-f",
+                "./cmsis-dap.cfg",
+                "-f",
+                "./stm32f1x.cfg",
+                "-c",
+                "program ./target/thumbv7m-none-eabi/debug/${fileBasenameNoExtension} verify reset exit",
+            ],
+            "group": "build",
+            "dependsOn": [
+                "cargo build debug"
+            ],
+        },
+        {
+            "label": "OpenOcd Erase",
+            "type": "shell",
+            "command": "openocd",
+            "args": [
+                "-f",
+                "${workspaceFolder}/cmsis-dap.cfg",
+                "-f",
+                "${workspaceFolder}/stm32f1x.cfg",
+                "-c",
+                "init; reset halt; flash erase_sector 0 0 last; reset run; shutdown"
+            ],
+            "group": "none",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "close": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "Cargo Size",
+            "type": "shell",
+            "command": "echo \"Size_of_Debug\";cargo size --bin ${fileBasenameNoExtension};echo \"Size_of_Release\"; cargo size --bin ${fileBasenameNoExtension} --release",
+            "presentation": {
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "clear": false,
+            }
+        },
+        {
+            "label": "Look for rtt",
+            "type": "shell",
+            "command": "rust-nm -S ${workspaceFolder}/target/thumbv7m-none-eabi/debug/${fileBasenameNoExtension}| grep RTT",
+            "group": "none",
+        },
+        {
             "label": "cargo build debug",
             "type": "shell",
             "command": "cargo",
@@ -10,7 +83,13 @@
                 "--bin",
                 "${fileBasenameNoExtension}"
             ],
-            "group": "build"
+            "group": "build",
+            "presentation": {
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "close": true
+            }
         },
         {
             "label": "cargo build release",
@@ -25,23 +104,19 @@
             "group": "build"
         },
         {
-            "label": "OpenOcd Flash Release",
+            "label": "defmt print",
             "type": "shell",
-            "command": "C:/Users/Administrator/.eide/tools/openocd_7a1adfbec_mingw32/bin/openocd",
+            "command": "./defmt_print.bat",
             "args": [
-                "-f",
-                "interface/cmsis-dap.cfg",
-                "-f",
-                "target/stm32f1x.cfg",
-                "-c",
-                "adapter speed 20000",
-                "-c",
-                "program ./target/thumbv7m-none-eabi/release/${fileBasenameNoExtension} verify reset exit",
+                "${fileBasenameNoExtension}"
             ],
-            "group": "build",
-            "dependsOn": [
-                "cargo build release"
-            ],
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true,
+                "close": true
+            },
         },
     ]
 }

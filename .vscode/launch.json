@@ -17,18 +17,45 @@
                 "${workspaceRoot}\\cmsis-dap.cfg",
                 "${workspaceRoot}\\stm32f1x.cfg",
             ],
-            "preLaunchTask": "cargo build debug",
+            "preLaunchTask": "OpenOcd Flash Debug",
             "preLaunchCommands": [],
-            "liveWatch": {
-                "enabled": true,
-                "samplesPerSecond": 4
+            "postLaunchCommands": [
+                "monitor rtt server start 6666 0",
+                //you may change   ↓  and     ↓ to adapt to your elf
+                "monitor rtt setup 0x20004bc0 100 \"SEGGER RTT\"",
+                "monitor rtt polling_interval 100",
+                "monitor rtt start",
+            ],
+        },
+        {
+            // this require vscode entension Shell Debugger
+            "type": "shell",
+            "cwd": "${workspaceFolder}",
+            "command": "",
+            "internalConsoleOptions": "openOnFirstSessionStart",
+            "request": "launch",
+            "name": "Defmt-print",
+            "preLaunchTask": "defmt print",
+            "presentation": {
+                "hidden": true,
+                "group": "Debug",
+                "order": 2
             }
-            // "postLaunchCommands": [
-            //     "monitor rtt server start 6666 0",
-            //     // should span the *right* part of RAM
-            //     "monitor rtt setup 0x200001a0 0x30 \"SEGGER RTT\"",
-            //     "monitor rtt start",
-            // ],
+        },
+    ],
+    "compounds": [
+        {
+            "name": "OpenOCD Debug with Defmt",
+            "configurations": [
+                "Defmt-print",
+                "Openocd Debug",
+            ],
+            "stopAll": true,
+            "presentation": {
+                "hidden": false,
+                "group": "Debug",
+                "order": 1
+            }
         }
     ]
 }

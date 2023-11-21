@@ -2,8 +2,9 @@
 #![no_main]
 
 use core::fmt::Write;
-
 use cortex_m_rt::entry;
+use defmt;
+use defmt_rtt as _;
 use panic_halt as _;
 use stm32f1xx_hal::{
     pac,
@@ -36,8 +37,14 @@ fn main() -> ! {
 
     let mut led = gpioa.pa0.into_push_pull_output(&mut gpioa.crl);
     let mut delay = cp.SYST.delay(&clocks);
+
+    defmt::info!("This is a Info.");
+    defmt::warn!("This is a warn");
+    defmt::error!("This is a Error");
+    defmt::println!("This is just print");
+    writeln!(tx, "Seial.").unwrap();
     loop {
-        writeln!(tx, "toggle.").unwrap();
+        defmt::info!("Led Toggle");
         led.toggle();
         delay.delay_ms(1000u16);
     }
