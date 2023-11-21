@@ -25,7 +25,7 @@
                 //    rtt tcp server port ↓    ↓ RTT Channel number
                 "monitor rtt server start 6666 0",
                 //you need to change   ↓  and  ↓ to the "SEGGER RTT" memory address in your memory
-                "monitor rtt setup 0x2001fbc0 100 \"SEGGER RTT\"",
+                "monitor rtt setup 0x20004bc0 100 \"SEGGER RTT\"",
                 "monitor rtt polling_interval 100",
                 "monitor rtt start",
             ],
