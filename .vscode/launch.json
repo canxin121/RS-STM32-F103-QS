@@ -1,7 +1,9 @@
 {
-    // 使用 IntelliSense 了解相关属性。 
-    // 悬停以查看现有属性的描述。
-    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    // Replace "STM32F103C8" to your chip (chip name from Probe-rs)
+    // Replace "thumbv7m-none-eabi" to your target platfrom
+    // Replace "cmsis-dap.cfg" to your interface cfg of openocd
+    // Replace "stm32f1x.cfg" to your target cfg of openocd
+    // Replace "STM32F103.svd" to your chip svd file
     "version": "0.2.0",
     "configurations": [
         {
@@ -12,23 +14,24 @@
             "type": "cortex-debug",
             "runToEntryPoint": "main",
             "servertype": "openocd",
-            "svdPath": "${workspaceRoot}/STM32F103.svd",
+            "svdPath": "./STM32F103.svd",
             "configFiles": [
-                "${workspaceRoot}\\cmsis-dap.cfg",
-                "${workspaceRoot}\\stm32f1x.cfg",
+                "./cmsis-dap.cfg",
+                "./stm32f1x.cfg",
             ],
             "preLaunchTask": "OpenOcd Flash Debug",
             "preLaunchCommands": [],
             "postLaunchCommands": [
+                //    rtt tcp server port ↓    ↓ RTT Channel number
                 "monitor rtt server start 6666 0",
-                //you may change   ↓  and     ↓ to adapt to your elf
-                "monitor rtt setup 0x20004bc0 100 \"SEGGER RTT\"",
+                //you need to change   ↓  and  ↓ to the "SEGGER RTT" memory address in your memory
+                "monitor rtt setup 0x2001fbc0 100 \"SEGGER RTT\"",
                 "monitor rtt polling_interval 100",
                 "monitor rtt start",
             ],
         },
         {
-            // this require vscode entension Shell Debugger
+            // this require vscode entension "Shell Debugger"
             "type": "shell",
             "cwd": "${workspaceFolder}",
             "command": "",
@@ -38,8 +41,39 @@
             "preLaunchTask": "defmt print",
             "presentation": {
                 "hidden": true,
+            }
+        },
+        {
+            "type": "probe-rs-debug",
+            "request": "launch",
+            "name": "Probe_rs Debug",
+            "cwd": ".",
+            "connectUnderReset": false,
+            "chip": "STM32F103C8",
+            "preLaunchTask": "cargo build debug",
+            "internalConsoleOptions": "openOnSessionStart",
+            "flashingConfig": {
+                "flashingEnabled": true,
+                "haltAfterReset": true
+            },
+            "coreConfigs": [
+                {
+                    "coreIndex": 0,
+                    "programBinary": "${workspaceFolder}/target/thumbv7m-none-eabi/debug/${fileBasenameNoExtension}",
+                    "logFormat": "{L} {s}",
+                    "rttEnabled": true,
+                    "options": {
+                        "env": {
+                            "DEFMT_LOG": "Trace"
+                        }
+                    },
+                },
+            ],
+            "consoleLogLevel": "Console",
+            "presentation": {
+                "hidden": false,
                 "group": "Debug",
-                "order": 2
+                "order": 1
             }
         },
     ],
@@ -54,7 +88,7 @@
             "presentation": {
                 "hidden": false,
                 "group": "Debug",
-                "order": 1
+                "order": 0
             }
         }
     ]
